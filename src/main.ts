@@ -30,6 +30,8 @@ async function bootstrap() {
 
   configureSwagger(app);
 
+  app.disable('x-powered-by');
+
   await app.listen(SERVER.PORT);
 
   showStartupMessages();
