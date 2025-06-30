@@ -9,7 +9,7 @@ export class AuthSuccessResponseDto {
 
   @ApiProperty({
     description: 'HTTP status code',
-    example: 200,
+    example: 201,
   })
   statusCode: number;
 }

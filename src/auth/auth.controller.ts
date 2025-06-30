@@ -46,7 +46,7 @@ export class AuthController {
   })
   @ApiBody({ type: LoginDto })
   @ApiResponse({
-    status: 200,
+    status: 201,
     description: 'Login successful, cookies set',
     type: AuthSuccessResponseDto,
   })
@@ -62,7 +62,7 @@ export class AuthController {
     @Res({ passthrough: true }) response: Response,
   ) {
     await this.authService.login(user, response);
-    return { message: 'Login successful', statusCode: 200 };
+    return { message: 'Login successful', statusCode: 201 };
   }
 
   @Post('refresh')

@@ -1,3 +1,4 @@
+/* eslint-disable max-len */
 import { INestApplication } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 
@@ -11,32 +12,18 @@ export const API_INFO = {
   VERSION: '1.0.0',
   DESCRIPTION: `A comprehensive NestJS authentication API with PostgreSQL & Prisma.
 
-## Features
+### Features
 - JWT Authentication with Access & Refresh tokens
 - Google OAuth2 integration
 - Local authentication (email/password)
 - Cookie-based token storage
 - Protected routes with guards
 
-## Authentication
+### Authentication
 This API uses JWT tokens stored in HTTP-only cookies for authentication.
 
-### Local Authentication
-1. Create user account via POST /users
-2. Login via POST /auth/login
-3. Access protected routes (tokens automatically included via cookies)
-4. Refresh tokens via POST /auth/refresh
-
-### Google OAuth
-1. Initiate OAuth flow via GET /auth/google
-2. Handle callback via GET /auth/google/callback
-3. User will be redirected to configured frontend URL
-
-## Guards & Strategies
-- **LocalAuthGuard**: For email/password login
-- **JwtAuthGuard**: For protecting routes requiring authentication
-- **JwtRefreshAuthGuard**: For refresh token validation
-- **GoogleAuthGuard**: For Google OAuth flow`,
+1. Local Authentication
+2. Google OAuth`,
 } as const;
 
 export const SWAGGER_TAGS = {
@@ -79,7 +66,18 @@ export const SWAGGER_OPTIONS = {
     docExpansion: 'none',
     filter: true,
     showRequestDuration: true,
+    theme: 'dark',
+    syntaxHighlight: {
+      theme: 'monokai',
+    },
+    tryItOutEnabled: true,
   },
+  customCss: `
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&' +
+      'family=JetBrains+Mono:wght@400;500;600&display=swap');
+  `,
+  customCssUrl: '/swagger-dark-theme.css',
+  customJsUrl: '/swagger-custom.js',
 } as const;
 
 export const CONSOLE_MESSAGES = {
@@ -97,6 +95,8 @@ export const CONSOLE_MESSAGES = {
       `  │  ✅ Server running on: http://localhost:${port}                          │`,
     API_DOCS: (port: number, path: string) =>
       `  │  📚 API Documentation: http://localhost:${port}/${path}                 │`,
+    LOG_VIEWER: (port: number, path: string) =>
+      `  │  🔍 Log Viewer: http://localhost:${port}/${path}                            │`,
     BOTTOM:
       '  └───────────────────────────────────────────────────────────────────────┘',
   },
@@ -113,6 +113,7 @@ export function configureSwagger(app: INestApplication): void {
     .setTitle(API_INFO.TITLE)
     .setDescription(API_INFO.DESCRIPTION)
     .setVersion(API_INFO.VERSION)
+    .addTag('App', 'Application endpoints')
     .addTag(
       SWAGGER_TAGS.AUTHENTICATION.name,
       SWAGGER_TAGS.AUTHENTICATION.description,
@@ -132,9 +133,7 @@ export function configureSwagger(app: INestApplication): void {
 /**
  * Start the server and display startup messages
  */
-export async function startServer(app: INestApplication): Promise<void> {
-  await app.listen(SERVER.PORT);
-
+export async function showStartupMessages(): Promise<void> {
   // Display startup messages
   console.log(CONSOLE_MESSAGES.SEPARATOR);
   console.log(CONSOLE_MESSAGES.APP_NAME);
@@ -147,6 +146,7 @@ export async function startServer(app: INestApplication): Promise<void> {
   console.log(
     CONSOLE_MESSAGES.STATUS_BOX.API_DOCS(SERVER.PORT, SERVER.API_DOCS_PATH),
   );
+  console.log(CONSOLE_MESSAGES.STATUS_BOX.LOG_VIEWER(SERVER.PORT, 'logs'));
   console.log(CONSOLE_MESSAGES.STATUS_BOX.EMPTY);
   console.log(CONSOLE_MESSAGES.STATUS_BOX.BOTTOM);
   console.log('\n');

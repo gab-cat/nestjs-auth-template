@@ -3,10 +3,15 @@ import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
 import cookieParser from 'cookie-parser';
 import { HttpLoggingInterceptor } from './common/logger/http-logging.interceptor';
-import { configureSwagger, startServer } from './constants';
+import { configureSwagger, SERVER, showStartupMessages } from './constants';
+import { NestExpressApplication } from '@nestjs/platform-express';
+import { join } from 'path';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create<NestExpressApplication>(AppModule);
+
+  // Serve static files from public directory
+  app.useStaticAssets(join(__dirname, '..', 'public'));
 
   // Global HTTP logging interceptor
   app.useGlobalInterceptors(app.get(HttpLoggingInterceptor));
@@ -25,7 +30,9 @@ async function bootstrap() {
 
   configureSwagger(app);
 
-  await startServer(app);
+  await app.listen(SERVER.PORT);
+
+  showStartupMessages();
 }
 
 void bootstrap();

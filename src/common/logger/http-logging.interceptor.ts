@@ -39,6 +39,7 @@ export class HttpLoggingInterceptor implements NestInterceptor {
                 statusCode,
               },
               'HTTP',
+              'route',
             );
           } else if (statusCode >= 400) {
             this.logger.warn(
@@ -50,17 +51,14 @@ export class HttpLoggingInterceptor implements NestInterceptor {
                 statusCode,
               },
               'HTTP',
+              'route',
             );
           } else {
             this.logger.info(
-              `← ${method} ${url} ${statusCode}`,
-              {
-                ip,
-                userAgent: userAgent.substring(0, 100),
-                responseTime: `${responseTime}ms`,
-                statusCode,
-              },
+              `← ${method} ${url} ${statusCode} ${responseTime}ms | ${ip} | ${userAgent.substring(0, 100)} `,
+              undefined,
               'HTTP',
+              'route',
             );
           }
         },
@@ -79,6 +77,7 @@ export class HttpLoggingInterceptor implements NestInterceptor {
               error: error.message,
             },
             'HTTP',
+            'route',
           );
         },
       }),

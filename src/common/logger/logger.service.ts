@@ -11,6 +11,11 @@ export interface LogEntry {
   message: string;
   context?: LogContext;
   service?: string;
+  category?: 'service' | 'route';
+}
+
+export interface LogEmitter {
+  emit(event: string, data: any): void;
 }
 
 @Injectable()
@@ -19,6 +24,7 @@ export class LoggerService {
   private readonly logLevel: string;
   private readonly serviceName: string;
   private readonly enableColors: boolean;
+  private logEmitter: LogEmitter | null = null;
 
   // ANSI color codes
   private readonly colors = {
@@ -64,27 +70,48 @@ export class LoggerService {
     }
   }
 
+  setLogEmitter(emitter: LogEmitter): void {
+    this.logEmitter = emitter;
+  }
+
   private formatLog(
     level: string,
     message: string,
     context?: LogContext,
     service?: string,
+    category: 'service' | 'route' = 'service',
   ): string {
-    const timestamp = new Date().toISOString();
+    const timestamp = this.isJsonFormat
+      ? new Date().toISOString()
+      : new Date().toLocaleString('en-US', {
+          year: 'numeric',
+          month: '2-digit',
+          day: '2-digit',
+          hour: '2-digit',
+          minute: '2-digit',
+          second: '2-digit',
+        });
+
+    const logEntry: LogEntry = {
+      timestamp,
+      level: level.toUpperCase(),
+      message,
+      ...(context && { context }),
+      ...(service && { service }),
+      category,
+    };
+
+    // Emit to WebSocket if available
+    if (this.logEmitter) {
+      this.logEmitter.emit('log', logEntry);
+    }
 
     if (this.isJsonFormat) {
-      const logEntry: LogEntry = {
-        timestamp,
-        level: level.toUpperCase(),
-        message,
-        ...(context && { context }),
-        ...(service && { service }),
-      };
       return JSON.stringify(logEntry);
     } else {
       const color = this.getColorForLevel(level);
       const reset = this.enableColors ? this.colors.reset : '';
-      const dimColor = this.enableColors ? this.colors.dim : '';
+      const dimColor = this.enableColors ? this.colors.white : '';
       const brightColor = this.enableColors ? this.colors.bright : '';
 
       const coloredTimestamp = this.enableColors
@@ -122,27 +149,49 @@ export class LoggerService {
     return messageLevel <= currentLevelIndex;
   }
 
-  error(message: string, context?: LogContext, service?: string): void {
+  error(
+    message: string,
+    context?: LogContext,
+    service?: string,
+    category: 'service' | 'route' = 'service',
+  ): void {
     if (this.shouldLog('error')) {
-      console.error(this.formatLog('error', message, context, service));
+      console.error(
+        this.formatLog('error', message, context, service, category),
+      );
     }
   }
 
-  warn(message: string, context?: LogContext, service?: string): void {
+  warn(
+    message: string,
+    context?: LogContext,
+    service?: string,
+    category: 'service' | 'route' = 'service',
+  ): void {
     if (this.shouldLog('warn')) {
-      console.warn(this.formatLog('warn', message, context, service));
+      console.warn(this.formatLog('warn', message, context, service, category));
     }
   }
 
-  info(message: string, context?: LogContext, service?: string): void {
+  info(
+    message: string,
+    context?: LogContext,
+    service?: string,
+    category: 'service' | 'route' = 'service',
+  ): void {
     if (this.shouldLog('info')) {
-      console.log(this.formatLog('info', message, context, service));
+      console.log(this.formatLog('info', message, context, service, category));
     }
   }
 
-  debug(message: string, context?: LogContext, service?: string): void {
+  debug(
+    message: string,
+    context?: LogContext,
+    service?: string,
+    category: 'service' | 'route' = 'service',
+  ): void {
     if (this.shouldLog('debug')) {
-      console.log(this.formatLog('debug', message, context, service));
+      console.log(this.formatLog('debug', message, context, service, category));
     }
   }
 
