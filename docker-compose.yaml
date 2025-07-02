@@ -1,6 +1,22 @@
 services:
+  # Application
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - '3000:3000'
+    environment:
+      - NODE_ENV=production
+      - DATABASE_URL=postgresql://username:password@postgres:5432/auth_template
+    depends_on:
+      - postgres
+    env_file:
+      - .env
+
+  # Database
   postgres:
-    image: postgres:15-alpine
+    image: postgres:17-alpine
     restart: unless-stopped
     ports:
       - '5432:5432'

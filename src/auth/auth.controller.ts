@@ -84,7 +84,7 @@ export class AuthController {
   })
   @ApiCookieAuth('Refresh')
   @ApiResponse({
-    status: 200,
+    status: 201,
     description: 'Token refreshed successfully, new cookies set',
     type: AuthSuccessResponseDto,
   })
@@ -97,7 +97,7 @@ export class AuthController {
     @Res({ passthrough: true }) response: Response,
   ) {
     await this.authService.login(user, response);
-    return { message: 'Token refreshed successfully', statusCode: 200 };
+    return { message: 'Token refreshed successfully', statusCode: 201 };
   }
 
   @Get('google')

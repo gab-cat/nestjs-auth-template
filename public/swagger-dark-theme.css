@@ -395,10 +395,19 @@ body {
 
 /* Response section */
 .swagger-ui .responses-wrapper {
-  background: var(--bg-secondary) !important;
-  border: 1px solid var(--border-color) !important;
+  background: var(--bg-tertiary) !important;
+  border: none;
   border-radius: var(--radius) !important;
   padding: 20px !important;
+}
+
+.swagger-ui .responses-wrapper .responses-inner {
+  border: none !important;
+}
+
+.swagger-ui .col_header {
+  background: var(--bg-tertiary) !important;
+  border: none !important;
 }
 
 .swagger-ui .response {
@@ -420,8 +429,22 @@ body {
 /* Enhanced response body */
 .swagger-ui .live-responses-table {
   background: var(--bg-primary) !important;
-  border: 1px solid var(--border-color) !important;
+  border: none !important;
   border-radius: var(--radius) !important;
+}
+
+.swagger-ui .responses-table {
+  border: none !important;
+}
+
+.swagger-ui .response {
+  border: none !important;
+  padding-bottom: 10px !important;
+}
+
+.swagger-ui .highlight-code {
+  border: none !important;
+  margin-bottom: 20px !important;
 }
 
 .swagger-ui .response-content-type {
@@ -566,7 +589,6 @@ body {
 /* Code blocks */
 .swagger-ui .highlight-code {
   background: var(--bg-primary) !important;
-  border: 1px solid var(--border-color) !important;
   border-radius: var(--radius) !important;
   color: var(--text-primary) !important;
   font-family: 'JetBrains Mono', 'Fira Code', 'Monaco', monospace !important;
@@ -577,6 +599,15 @@ body {
 
 .swagger-ui .highlight-code .microlight {
   color: var(--accent-color) !important;
+}
+
+.swagger-ui .opblock-body pre.microlight {
+  font-family: 'JetBrains Mono', 'Fira Code', 'Monaco', monospace !important;
+}
+
+.swagger-ui code,
+.swagger-ui .code {
+  font-family: 'JetBrains Mono', 'Fira Code', 'Monaco', monospace !important;
 }
 
 .swagger-ui .microlight {
@@ -969,6 +1000,8 @@ body {
   border: 1px solid var(--border-color) !important;
   border-radius: var(--radius) !important;
   padding: 15px !important;
+  max-width: 1420px !important;
+  margin: 0 auto !important;
 }
 
 .swagger-ui .scheme-container .schemes-title {
@@ -977,8 +1010,6 @@ body {
 
 /* Footer or bottom elements */
 .swagger-ui .information-container {
-  background: var(--bg-secondary) !important;
-  border-top: 1px solid var(--border-color) !important;
+  background: var(--bg-primary) !important;
   padding: 20px !important;
-  margin-top: 30px !important;
 }
