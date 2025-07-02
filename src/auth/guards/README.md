@@ -4,12 +4,12 @@ This directory contains NestJS guards that protect routes and control access to 
 
 ## Overview
 
-| Guard | Purpose | Strategy Used | When to Use |
-|-------|---------|---------------|-------------|
-| `LocalAuthGuard` | Email/password authentication | `LocalStrategy` | Login endpoints |
-| `JwtAuthGuard` | JWT token validation | `JwtStrategy` | Protected routes |
-| `JwtRefreshAuthGuard` | Refresh token validation | `JwtRefreshStrategy` | Token refresh endpoints |
-| `GoogleAuthGuard` | Google OAuth flow | `GoogleStrategy` | Google authentication |
+| Guard                 | Purpose                       | Strategy Used        | When to Use             |
+| --------------------- | ----------------------------- | -------------------- | ----------------------- |
+| `LocalAuthGuard`      | Email/password authentication | `LocalStrategy`      | Login endpoints         |
+| `JwtAuthGuard`        | JWT token validation          | `JwtStrategy`        | Protected routes        |
+| `JwtRefreshAuthGuard` | Refresh token validation      | `JwtRefreshStrategy` | Token refresh endpoints |
+| `GoogleAuthGuard`     | Google OAuth flow             | `GoogleStrategy`     | Google authentication   |
 
 ## Guards in Detail
 
@@ -20,6 +20,7 @@ This directory contains NestJS guards that protect routes and control access to 
 **Purpose:** Validates user credentials (email and password) for local authentication.
 
 **Usage:**
+
 ```typescript
 @Post('login')
 @UseGuards(LocalAuthGuard)
@@ -29,6 +30,7 @@ async login(@CurrentUser() user: User, @Res() response: Response) {
 ```
 
 **How it works:**
+
 1. Extracts email and password from request body
 2. Uses `LocalStrategy` to validate credentials
 3. Calls `AuthService.verifyUser()` to check credentials against database
@@ -36,6 +38,7 @@ async login(@CurrentUser() user: User, @Res() response: Response) {
 5. If invalid, throws `UnauthorizedException`
 
 **Required request format:**
+
 ```json
 {
   "email": "user@example.com",
@@ -50,6 +53,7 @@ async login(@CurrentUser() user: User, @Res() response: Response) {
 **Purpose:** Validates JWT access tokens to protect routes requiring authentication.
 
 **Usage:**
+
 ```typescript
 @Get('protected')
 @UseGuards(JwtAuthGuard)
@@ -59,6 +63,7 @@ async getProtectedData(@CurrentUser() user: User) {
 ```
 
 **How it works:**
+
 1. Extracts JWT token from `Authentication` cookie
 2. Uses `JwtStrategy` to validate and decode token
 3. Fetches user from database using token's `userId`
@@ -66,6 +71,7 @@ async getProtectedData(@CurrentUser() user: User) {
 5. If invalid/expired, throws `UnauthorizedException`
 
 **Required cookies:**
+
 - `Authentication`: Valid JWT access token
 
 ### JwtRefreshAuthGuard
@@ -75,6 +81,7 @@ async getProtectedData(@CurrentUser() user: User) {
 **Purpose:** Validates refresh tokens for token renewal.
 
 **Usage:**
+
 ```typescript
 @Post('refresh')
 @UseGuards(JwtRefreshAuthGuard)
@@ -84,6 +91,7 @@ async refreshToken(@CurrentUser() user: User, @Res() response: Response) {
 ```
 
 **How it works:**
+
 1. Extracts JWT refresh token from `Refresh` cookie
 2. Uses `JwtRefreshStrategy` to validate token
 3. Compares token with hashed version in database
@@ -91,6 +99,7 @@ async refreshToken(@CurrentUser() user: User, @Res() response: Response) {
 5. If invalid/expired, throws `UnauthorizedException`
 
 **Required cookies:**
+
 - `Refresh`: Valid JWT refresh token
 
 ### GoogleAuthGuard
@@ -100,6 +109,7 @@ async refreshToken(@CurrentUser() user: User, @Res() response: Response) {
 **Purpose:** Handles Google OAuth 2.0 authentication flow.
 
 **Usage:**
+
 ```typescript
 // Initiate OAuth flow
 @Get('google')
@@ -117,6 +127,7 @@ async googleCallback(@CurrentUser() user: User) {
 ```
 
 **How it works:**
+
 1. **Initiation:** Redirects user to Google OAuth consent screen
 2. **Callback:** Receives authorization code from Google
 3. Uses `GoogleStrategy` to exchange code for user profile
@@ -124,6 +135,7 @@ async googleCallback(@CurrentUser() user: User) {
 5. User object is attached to request
 
 **Required environment variables:**
+
 - `GOOGLE_CLIENT_ID`: Google OAuth client ID
 - `GOOGLE_CLIENT_SECRET`: Google OAuth client secret
 
@@ -166,12 +178,14 @@ async getProfile(@CurrentUser() user: User) {
 ## Best Practices
 
 ### 1. Guard Selection
+
 - Use `LocalAuthGuard` only for login endpoints
 - Use `JwtAuthGuard` for all protected routes
 - Use `JwtRefreshAuthGuard` only for token refresh
 - Use `GoogleAuthGuard` for OAuth flow endpoints
 
 ### 2. Route Protection
+
 ```typescript
 // ✅ Good: Protect sensitive routes
 @Get('admin/users')
@@ -185,6 +199,7 @@ async healthCheck() { ... }
 ```
 
 ### 3. Global vs Route-level Guards
+
 ```typescript
 // Global guard (apply to all routes)
 app.useGlobalGuards(new JwtAuthGuard());
@@ -194,6 +209,7 @@ app.useGlobalGuards(new JwtAuthGuard());
 ```
 
 ### 4. Multiple Guards
+
 ```typescript
 // Apply multiple guards (all must pass)
 @UseGuards(JwtAuthGuard, AdminGuard)
@@ -203,6 +219,7 @@ async adminOnlyEndpoint() { ... }
 ## Testing Guards
 
 ### Unit Testing
+
 ```typescript
 describe('JwtAuthGuard', () => {
   it('should allow access with valid token', async () => {
@@ -218,6 +235,7 @@ describe('JwtAuthGuard', () => {
 ```
 
 ### Integration Testing
+
 ```typescript
 describe('Protected Endpoint', () => {
   it('should return data when authenticated', async () => {
@@ -228,9 +246,7 @@ describe('Protected Endpoint', () => {
   });
 
   it('should return 401 when unauthenticated', async () => {
-    return request(app.getHttpServer())
-      .get('/protected')
-      .expect(401);
+    return request(app.getHttpServer()).get('/protected').expect(401);
   });
 });
 ```
@@ -257,6 +273,7 @@ describe('Protected Endpoint', () => {
 ### Debug Tips
 
 1. **Enable debug logging:**
+
 ```typescript
 // In strategy files
 console.log('Token payload:', payload);
@@ -264,13 +281,15 @@ console.log('User found:', user);
 ```
 
 2. **Check cookie values:**
+
 ```typescript
 // In guard context
 console.log('Cookies:', request.cookies);
 ```
 
 3. **Verify database queries:**
+
 ```typescript
 // In user service
 console.log('Searching user with:', query);
-``` 
+```

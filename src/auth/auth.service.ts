@@ -38,6 +38,7 @@ export class AuthService {
 
     const tokenPayload: TokenPayload = {
       userId: user.id,
+      roles: user.roles,
     };
     const accessToken = this.jwtService.sign(tokenPayload, {
       secret: this.configService.getOrThrow('JWT_ACCESS_TOKEN_SECRET'),
@@ -45,12 +46,15 @@ export class AuthService {
         'JWT_ACCESS_TOKEN_EXPIRATION_MS',
       )}ms`,
     });
-    const refreshToken = this.jwtService.sign(tokenPayload, {
-      secret: this.configService.getOrThrow('JWT_REFRESH_TOKEN_SECRET'),
-      expiresIn: `${this.configService.getOrThrow(
-        'JWT_REFRESH_TOKEN_EXPIRATION_MS',
-      )}ms`,
-    });
+    const refreshToken = this.jwtService.sign(
+      { userId: tokenPayload.userId },
+      {
+        secret: this.configService.getOrThrow('JWT_REFRESH_TOKEN_SECRET'),
+        expiresIn: `${this.configService.getOrThrow(
+          'JWT_REFRESH_TOKEN_EXPIRATION_MS',
+        )}ms`,
+      },
+    );
 
     await this.usersService.updateUser(
       { id: user.id },

@@ -6,7 +6,7 @@ import {
 import { hash } from 'bcryptjs';
 import { CreateUserRequest } from './dto/create-user.request';
 import { PrismaService } from '../common/prisma/prisma.service';
-import { User } from 'generated/prisma/client';
+import { Role, User } from 'generated/prisma/client';
 
 @Injectable()
 export class UsersService {
@@ -23,6 +23,7 @@ export class UsersService {
       data: {
         ...data,
         password: await hash(data.password, 10),
+        roles: [Role.USER],
       },
     });
   }
@@ -61,6 +62,7 @@ export class UsersService {
       data: {
         ...data,
         password: await hash(data.password, 10),
+        roles: [Role.USER],
       },
     });
   }

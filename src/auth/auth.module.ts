@@ -8,6 +8,7 @@ import { LocalStrategy } from './strategies/local.strategy';
 import { JwtStrategy } from './strategies/jwt.strategy';
 import { JwtRefreshStrategy } from './strategies/jwt-refresh.strategy';
 import { GoogleStrategy } from './strategies/google.strategy';
+import { FailedLoginThrottleGuard } from './guards/failed-login-throttle.guard';
 
 @Module({
   imports: [UsersModule, PassportModule, JwtModule],
@@ -18,6 +19,7 @@ import { GoogleStrategy } from './strategies/google.strategy';
     JwtStrategy,
     JwtRefreshStrategy,
     GoogleStrategy,
+    FailedLoginThrottleGuard,
   ],
 })
 export class AuthModule {}

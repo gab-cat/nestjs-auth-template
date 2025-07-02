@@ -60,6 +60,24 @@ export const COOKIE_AUTH = {
   },
 } as const;
 
+export const RATE_LIMITING = {
+  FAILED_LOGIN: {
+    MAX_ATTEMPTS: 5,
+    WINDOW_MS: 15 * 60 * 1000, // 15 minutes
+    BLOCK_DURATION_MS: 15 * 60 * 1000, // 15 minutes
+  },
+  THROTTLE: {
+    DEFAULT: {
+      TTL: 60000, // 1 minute
+      LIMIT: 10, // 10 requests per minute
+    },
+    LOGIN_ATTEMPTS: {
+      TTL: 900000, // 15 minutes
+      LIMIT: 5, // 5 failed attempts per 15 minutes
+    },
+  },
+} as const;
+
 export const SWAGGER_OPTIONS = {
   swaggerOptions: {
     persistAuthorization: true,

@@ -3,7 +3,7 @@ import { CreateUserRequest } from './dto/create-user.request';
 import { UsersService } from './users.service';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { CurrentUser } from 'src/auth/current-user.decorator';
-import { User } from 'generated/prisma/client';
+import { Role, User } from 'generated/prisma/client';
 import {
   ApiTags,
   ApiOperation,
@@ -19,6 +19,8 @@ import {
   UserResponseDto,
 } from './dto/user-response.dto';
 import { LoggerService } from '../common/logger/logger.service';
+import { Roles } from 'src/auth/roles/roles.decorator';
+import { RolesGuard } from 'src/auth/guards/roles.guard';
 
 @ApiTags('Users')
 @Controller('users')
@@ -66,7 +68,8 @@ export class UsersController {
   }
 
   @Get()
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.STAFF, Role.ADMIN)
   @ApiOperation({
     summary: 'Get all users (protected)',
     description: `

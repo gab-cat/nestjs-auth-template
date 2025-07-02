@@ -5,6 +5,7 @@ import { Response } from 'express';
 import { AuthService } from './auth.service';
 import { JwtRefreshAuthGuard } from './guards/jwt-refresh-auth.guard';
 import { GoogleAuthGuard } from './guards/google-auth.guard';
+import { FailedLoginThrottleGuard } from './guards/failed-login-throttle.guard';
 import { User } from 'generated/prisma/client';
 import {
   ApiTags,
@@ -24,20 +25,30 @@ import {
 @ApiTags('Authentication')
 @Controller('auth')
 export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+  constructor(
+    private readonly authService: AuthService,
+    private readonly failedLoginThrottleGuard: FailedLoginThrottleGuard,
+  ) {}
 
   @Post('login')
-  @UseGuards(LocalAuthGuard)
+  @UseGuards(FailedLoginThrottleGuard, LocalAuthGuard)
   @ApiOperation({
     summary: 'Login with email and password',
     description: `
       Authenticates user with email and password credentials.
       
       ## How it works:
-      1. Validates credentials using LocalAuthGuard (LocalStrategy)
-      2. Generates JWT access and refresh tokens
-      3. Sets HTTP-only cookies with tokens
-      4. Returns success response
+      1. Checks for rate limiting (max 5 failed attempts per 15 minutes per IP)
+      2. Validates credentials using LocalAuthGuard (LocalStrategy)
+      3. Generates JWT access and refresh tokens
+      4. Sets HTTP-only cookies with tokens
+      5. Returns success response
+      
+      ## Rate Limiting:
+      - Maximum 5 failed login attempts per IP address within 15 minutes
+      - After 5 failed attempts, IP is temporarily blocked for 15 minutes
+      - Successful login clears the failed attempt counter
+      - Error messages include remaining attempts and lockout duration
       
       ## Cookies set:
       - \`Authentication\`: JWT access token (1 hour expiry)
